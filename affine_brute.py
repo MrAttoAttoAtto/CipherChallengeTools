@@ -8,7 +8,7 @@ def brute_ciphertext(ciphertext):
         for constant in range(26):
             #print(affine.decipher(ciphertext, multiplier, constant).lower())
             plaintext = affine.decipher(ciphertext, multiplier, constant).lower()
-            if ' the ' in plaintext and ' i ' in plaintext:
+            if ' the ' in plaintext and ' and ' in plaintext:
                 # Fix later
                 print(f"Possibly: x->{multiplier}x+{constant}")
                 print(affine.decipher(ciphertext, multiplier, constant).lower())
