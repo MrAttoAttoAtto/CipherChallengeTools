@@ -32,10 +32,11 @@ def most_likely_codeword_lengths(text):
 def split_text(text, codeword_length):
     return [text[i::codeword_length] for i in range(codeword_length)]
 
-def brute_vigenere(ciphertext, codeword_length, overrides={}):
+def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[]):
     # This assumes a caesar cipher
     # Overrides should be a dictionary of index: override value values. The override value is the "place" of how common 'e' is in that shift. 1 means it is the most common, 2 second most, etc.
-    # TODO, make this automatic
+    # -1 means it could be anything
+
     ciphertext = re.sub(utils.EXCEPT_LOWER_ALPHABET, '', ciphertext)
 
     text_chunks = split_text(ciphertext, codeword_length)
@@ -43,31 +44,90 @@ def brute_vigenere(ciphertext, codeword_length, overrides={}):
     deciphered_text_chunks = []
     for i, chunk in enumerate(text_chunks):
         frequency_analysis = utils.frequency_analyse(chunk)
-        probably_e = sorted(frequency_analysis.items(), key=lambda key: frequency_analysis[key[0]])[-1 if i not in overrides.keys() else -overrides[i]][0]
 
-        print(probably_e)
+        sorted_frequency_analysis = sorted(frequency_analysis.items(), key=lambda key: frequency_analysis[key[0]])
+
+        print(f'Chunk {i+1}: Most frequent: {sorted_frequency_analysis[-1][1]:.2f}%, Second: {sorted_frequency_analysis[-2][1]:.2f}%, Difference: {sorted_frequency_analysis[-1][1]-sorted_frequency_analysis[-2][1]:.2f}')
+
+        if not len(overrides) == codeword_length:
+            deciphered_text_chunks.append([])
+            for e_frequency in [1,2,3]:
+                probably_e = sorted_frequency_analysis[-e_frequency][0]
+                
+                # 4 is e's index
+                shift = letters.index(probably_e) - 4
+
+                deciphered_text_chunks[i].append(affine.decipher(chunk, 1, shift))
+        else:
+            probably_e = sorted_frequency_analysis[-overrides[i]][0]
+            
+            # 4 is e's index
+            shift = letters.index(probably_e) - 4
+
+            deciphered_text_chunks.append(affine.decipher(chunk, 1, shift))
+
+    if len(overrides) == codeword_length:
+        plaintext = ''
+
+        i = -1
+        while True:
+            i += 1
+            try:
+                for j in range(codeword_length):
+                    plaintext += deciphered_text_chunks[j][i]
+            except IndexError:
+                break
         
-        # 4 is e's index
-        shift = letters.index(probably_e) - 4
+        print(f"E frequency places: {', '.join([str(e_frequency) for e_frequency in overrides])}\n{plaintext}")
+    else:
+        recursive_combination(codeword_length, deciphered_text_chunks, keywords, overrides, [], codeword_length)
 
-        deciphered_text_chunks.append(affine.decipher(chunk, 1, shift))
 
-    plaintext = ''
-    i = -1
-    while True:
-        i += 1
-        try:
-            for j in range(codeword_length):
-                plaintext += deciphered_text_chunks[j][i]
-        except IndexError:
-            break
+def recursive_combination(length, text_chunks, keywords, overrides, order, level):
+    if level != 0:
+        level -= 1
+        recursive_combination(length, text_chunks, keywords, overrides, order + [0], level)
+        recursive_combination(length, text_chunks, keywords, overrides, order + [1], level)
+        recursive_combination(length, text_chunks, keywords, overrides, order + [2], level)
+    else:
+        # Makes sure that, if an override is set, only the ones satisfying the override work
+        applicable = True
+        if overrides and not order == [0]*length:
+            for i in range(length):
+                try:
+                    if overrides[i] != order[i]+1 and overrides[i] != -1:
+                        applicable = False
+                except IndexError:
+                    pass
 
-    i = -1
-    while True:
-        i += 1
-        try:
-            for j in range(codeword_length):
-                print(deciphered_text_chunks[j][i], end='')
-            print('')
-        except IndexError:
-            break
+        if not applicable:
+            return
+
+        plaintext = ''
+
+        i = -1
+        while True:
+            i += 1
+            try:
+                for j in range(length):
+                    plaintext += text_chunks[j][order[j]][i]
+            except IndexError:
+                break
+        
+        # If it's a possible plaintext (has certain words), or it's the one where E is the most common (for extended analysis)
+        if all(word in plaintext for word in ["the", "of", "and", "to", "in", "is", "for", "that", "was", 'on', 'with', 'it'] + keywords) or order == [0]*length:
+            '''columns = []
+            for i in range(0, len(plaintext), length):
+                chunk = ''
+                for j in range(i, i+length):
+                    try:
+                        chunk += plaintext[j]
+                    except IndexError:
+                        break
+                
+                columns.append(chunk)
+
+            backslash = '\n'
+            print(f'E frequency places: {", ".join([str(e_frequency+1) for e_frequency in order])}\n{backslash.join(columns)}\n')'''
+
+            print(f'E frequency places: {", ".join([str(e_frequency+1) for e_frequency in order])}\n{plaintext}\n')
