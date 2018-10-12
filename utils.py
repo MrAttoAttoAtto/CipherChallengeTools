@@ -11,8 +11,10 @@ def frequency_analyse(text):
     counted_items = Counter(stripped_text)
     char_count = len(stripped_text)
 
-    for letter, count in sorted(dict(counted_items).items()):
-        print(f'{letter}: {count/char_count*100:.2f}% occurrence rate')
+    return {letter: count/char_count*100 for letter, count in dict(counted_items).items()}
+    
+    #for letter, count in sorted(dict(counted_items).items()):
+    #    print(f'{letter}: {count/char_count*100:.2f}% occurrence rate')
 
 def index_of_coincidence(text):
     stripped_text = re.sub(EXCEPT_LOWER_ALPHABET, '', text)
