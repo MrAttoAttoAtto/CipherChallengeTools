@@ -49,7 +49,7 @@ def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[]):
 
         print(f'Chunk {i+1}: Most frequent: {sorted_frequency_analysis[-1][1]:.2f}%, Second: {sorted_frequency_analysis[-2][1]:.2f}%, Difference: {sorted_frequency_analysis[-1][1]-sorted_frequency_analysis[-2][1]:.2f}')
 
-        if not len(overrides) == codeword_length:
+        if not len(overrides) == codeword_length or -1 in overrides:
             deciphered_text_chunks.append([])
             for e_frequency in [1,2,3]:
                 probably_e = sorted_frequency_analysis[-e_frequency][0]
@@ -66,7 +66,7 @@ def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[]):
 
             deciphered_text_chunks.append(affine.decipher(chunk, 1, shift))
 
-    if len(overrides) == codeword_length:
+    if len(overrides) == codeword_length and -1 not in overrides:
         plaintext = ''
 
         i = -1
