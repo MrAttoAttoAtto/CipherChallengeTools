@@ -42,20 +42,24 @@ def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[]):
     text_chunks = split_text(ciphertext, codeword_length)
 
     deciphered_text_chunks = []
+    shifts = []
     for i, chunk in enumerate(text_chunks):
         frequency_analysis = utils.frequency_analyse(chunk)
 
         sorted_frequency_analysis = sorted(frequency_analysis.items(), key=lambda key: frequency_analysis[key[0]])
 
-        print(f'Chunk {i+1}: Most frequent: {sorted_frequency_analysis[-1][1]:.2f}%, Second: {sorted_frequency_analysis[-2][1]:.2f}%, Difference: {sorted_frequency_analysis[-1][1]-sorted_frequency_analysis[-2][1]:.2f}')
+        print(f'Chunk {i+1}: Most frequent: {sorted_frequency_analysis[-1][1]:.2f}%, Second: {sorted_frequency_analysis[-2][1]:.2f}%, Difference: {sorted_frequency_analysis[-1][1]-sorted_frequency_analysis[-2][1]:.2f}%')
 
         if not len(overrides) == codeword_length or -1 in overrides:
             deciphered_text_chunks.append([])
+            shifts.append([])
+
             for e_frequency in [1,2,3]:
                 probably_e = sorted_frequency_analysis[-e_frequency][0]
                 
                 # 4 is e's index
                 shift = letters.index(probably_e) - 4
+                shifts[i].append(shift)
 
                 deciphered_text_chunks[i].append(affine.decipher(chunk, 1, shift))
         else:
@@ -63,6 +67,7 @@ def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[]):
             
             # 4 is e's index
             shift = letters.index(probably_e) - 4
+            shifts.append(shift)
 
             deciphered_text_chunks.append(affine.decipher(chunk, 1, shift))
 
@@ -77,18 +82,24 @@ def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[]):
                     plaintext += deciphered_text_chunks[j][i]
             except IndexError:
                 break
+
+        codeword = ''
+        codeword_alter = ''
+        for i in range(codeword_length):
+            codeword += letters[shifts[i]-1]
+            codeword_alter += letters[shifts[i]]
         
-        print(f"E frequency places: {', '.join([str(e_frequency) for e_frequency in overrides])}\n{plaintext}")
+        print(f"E frequency places: {', '.join([str(e_frequency) for e_frequency in overrides])}\n{plaintext}\nCodeword: {codeword.upper()} or {codeword_alter.upper()}\n")
     else:
-        recursive_combination(codeword_length, deciphered_text_chunks, keywords, overrides, [], codeword_length)
+        recursive_combination(codeword_length, deciphered_text_chunks, keywords, overrides, shifts, [], codeword_length)
 
 
-def recursive_combination(length, text_chunks, keywords, overrides, order, level):
+def recursive_combination(length, text_chunks, keywords, overrides, shifts, order, level):
     if level != 0:
         level -= 1
-        recursive_combination(length, text_chunks, keywords, overrides, order + [0], level)
-        recursive_combination(length, text_chunks, keywords, overrides, order + [1], level)
-        recursive_combination(length, text_chunks, keywords, overrides, order + [2], level)
+        recursive_combination(length, text_chunks, keywords, overrides, shifts, order + [0], level)
+        recursive_combination(length, text_chunks, keywords, overrides, shifts, order + [1], level)
+        recursive_combination(length, text_chunks, keywords, overrides, shifts, order + [2], level)
     else:
         # Makes sure that, if an override is set, only the ones satisfying the override work
         applicable = True
@@ -130,4 +141,10 @@ def recursive_combination(length, text_chunks, keywords, overrides, order, level
             backslash = '\n'
             print(f'E frequency places: {", ".join([str(e_frequency+1) for e_frequency in order])}\n{backslash.join(columns)}\n')'''
 
-            print(f'E frequency places: {", ".join([str(e_frequency+1) for e_frequency in order])}\n{plaintext}\n')
+            codeword = ''
+            codeword_alter = ''
+            for i in range(length):
+                codeword += letters[shifts[i][order[i]]-1]
+                codeword_alter += letters[shifts[i][order[i]]]
+
+            print(f'E frequency places: {", ".join([str(e_frequency+1) for e_frequency in order])}\n{plaintext}\nCodeword: {codeword.upper()} or {codeword_alter.upper()}\n')
