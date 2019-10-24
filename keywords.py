@@ -39,9 +39,6 @@ def decipher(ciphertext, keyword):
     back_mapping = make_back_mapping(keyword)
     plaintext = ""
 
-    if back_mapping["k"] != "e" or back_mapping["n"] != "h" or back_mapping["d"] != "t":
-        return "no"
-
     for letter in ciphertext:
         plaintext += back_mapping[letter]
     
