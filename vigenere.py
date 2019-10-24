@@ -39,13 +39,16 @@ def reinsert_chars(plaintext, extra_chars):
     
     return ''.join(pt_list)
 
-def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[], depth=3):
+def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[], depth=3, include_extra_chars=False):
     # This assumes a caesar cipher
     # Overrides should be a dictionary of index: override value values. The override value is the "place" of how common 'e' is in that shift. 1 means it is the most common, 2 second most, etc.
     # -1 means it could be anything
     ciphertext = ciphertext.lower()
 
-    extra_chars = [[m.group(0), m.start(0)] for m in re.finditer(utils.EXCEPT_LOWER_ALPHABET, ciphertext)]
+    if include_extra_chars:
+        extra_chars = [[m.group(0), m.start(0)] for m in re.finditer(utils.EXCEPT_LOWER_ALPHABET, ciphertext)]
+    else:
+        extra_chars = []
 
     ciphertext = re.sub(utils.EXCEPT_LOWER_ALPHABET, '', ciphertext)
 
