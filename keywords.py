@@ -15,7 +15,7 @@ def read_words():
 
     return fixed_words
 
-def make_back_mapping(keyword):
+def make_mapping(keyword):
     mapping = ""
     for letter in keyword:
         if letter not in mapping:
@@ -28,6 +28,11 @@ def make_back_mapping(keyword):
             offset += 1
         
         mapping += letters[(i+last_letter_index+offset) % 26]
+    
+    return mapping
+
+def make_back_mapping_dict(keyword):
+    mapping = make_mapping(keyword)
 
     mapping_dict = {}
     for i in range(26):
@@ -36,7 +41,10 @@ def make_back_mapping(keyword):
     return mapping_dict
 
 def decipher(ciphertext, keyword):
-    back_mapping = make_back_mapping(keyword)
+    ciphertext = ciphertext.lower()
+    ciphertext = re.sub(EXCEPT_LOWER_ALPHABET, "", ciphertext)
+
+    back_mapping = make_back_mapping_dict(keyword)
     plaintext = ""
 
     for letter in ciphertext:
@@ -58,11 +66,12 @@ def brute_keyword(ciphertext, likely_words=[]):
 
         if i % 1000 == 0:
             print(i)
-        
 
         if all(word in plaintext for word in words_to_check):
             print(plaintext)
-            print(word)
+
+            mapping = make_mapping(word)
+            print("\n"+letters+"\n"+mapping)
 
 def frequency_guess(ciphertext):
     ciphertext = ciphertext.lower()
@@ -93,4 +102,4 @@ def frequency_guess(ciphertext):
                 keyword += mapped
     
     print(plaintext)
-    print(keyword)
+    print("\n"+letters+"\n"+keyword)
