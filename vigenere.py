@@ -32,10 +32,20 @@ def most_likely_codeword_lengths(text):
 def split_text(text, codeword_length):
     return [text[i::codeword_length] for i in range(codeword_length)]
 
+def reinsert_chars(plaintext, extra_chars):
+    pt_list = list(plaintext)
+    for char_item in extra_chars:
+        pt_list.insert(char_item[1], char_item[0])
+    
+    return ''.join(pt_list)
+
 def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[], depth=3):
     # This assumes a caesar cipher
     # Overrides should be a dictionary of index: override value values. The override value is the "place" of how common 'e' is in that shift. 1 means it is the most common, 2 second most, etc.
     # -1 means it could be anything
+    ciphertext = ciphertext.lower()
+
+    extra_chars = [[m.group(0), m.start(0)] for m in re.finditer(utils.EXCEPT_LOWER_ALPHABET, ciphertext)]
 
     ciphertext = re.sub(utils.EXCEPT_LOWER_ALPHABET, '', ciphertext)
 
@@ -88,17 +98,19 @@ def brute_vigenere(ciphertext, codeword_length, keywords=[], overrides=[], depth
         for i in range(codeword_length):
             codeword += letters[shifts[i]-1]
             codeword_alter += letters[shifts[i]]
+
+        plaintext = reinsert_chars(plaintext, extra_chars)
         
         print(f"E frequency places: {', '.join([str(e_frequency) for e_frequency in overrides])}\n{plaintext}\nCodeword: {codeword.upper()} or {codeword_alter.upper()}\n")
     else:
-        recursive_combination(codeword_length, deciphered_text_chunks, keywords, overrides, shifts, [], codeword_length, depth)
+        recursive_combination(codeword_length, deciphered_text_chunks, keywords, overrides, shifts, [], codeword_length, depth, extra_chars)
 
 
-def recursive_combination(length, text_chunks, keywords, overrides, shifts, order, level, depth):
+def recursive_combination(length, text_chunks, keywords, overrides, shifts, order, level, depth, extra_chars):
     if level != 0:
         level -= 1
         for i in range(depth):
-            recursive_combination(length, text_chunks, keywords, overrides, shifts, order + [i], level, depth)
+            recursive_combination(length, text_chunks, keywords, overrides, shifts, order + [i], level, depth, extra_chars)
     else:
         # Makes sure that, if an override is set, only the ones satisfying the override work
         applicable = True
@@ -123,6 +135,8 @@ def recursive_combination(length, text_chunks, keywords, overrides, shifts, orde
                     plaintext += text_chunks[j][order[j]][i]
             except IndexError:
                 break
+
+        plaintext = reinsert_chars(plaintext, extra_chars)
         
         # If it's a possible plaintext (has certain words), or it's the one where E is the most common (for extended analysis)
         if all(word in plaintext for word in ["the", "of", "and",
