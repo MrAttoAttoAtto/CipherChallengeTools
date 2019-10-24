@@ -1,7 +1,7 @@
 
 import itertools
 
-LIKELY_WORDS = ["THE", "AND", "THA", "SHADOW"]
+LIKELY_WORDS = ["THE", "AND", "THA"]
 
 def decrypt_rows(ciphertext, order):
     kwlen = len(order)
