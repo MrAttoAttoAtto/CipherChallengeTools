@@ -1,7 +1,9 @@
 
 import itertools
+import re
+from utils import EXCEPT_LOWER_ALPHABET
 
-LIKELY_WORDS = ["THE", "AND", "THA"]
+LIKELY_WORDS = ["the", "and", "tha"]
 
 def decrypt_rows(ciphertext, order):
     kwlen = len(order)
@@ -67,17 +69,22 @@ def try_find_anagram(ciphertext, kwlen):
     print(order_counts)
     return (sorted(order_counts.items(), key=lambda kv: kv[1])[-1]) if len(order_counts) else ((), 0)
 
-def brute_force(text, likely_words):
+def brute_force(text, likely_words=LIKELY_WORDS, kwlens=None):
     """Not attractive, but effective and fast enough"""
-    ciphertext = text.upper().replace(" ", "")
+    ciphertext = re.sub(EXCEPT_LOWER_ALPHABET, "", text.lower())
     possibles = []
     try:
-        for kwlen in range(3, 12):
+        if kwlens is None:
+            kwlens = range(2, 12)
+        elif type(kwlens) == type(1): # If it's an int, make it a list with only itself in it
+            kwlens = [kwlens]
+
+        for kwlen in kwlens:
             print(kwlen)
             colsolved = ''.join(rows_from_columns(ciphertext, kwlen))
             for l in itertools.permutations(range(kwlen)):
                 trans = decrypt_rows(colsolved, l)
-                for w in LIKELY_WORDS:
+                for w in likely_words:
                     if w not in trans: 
                         break
                 else:
