@@ -24,7 +24,7 @@ def most_likely_codeword_lengths(text):
         average_iocs[length] = summed_ioc/length
     
     # 5 seems good
-    closest_iocs = sorted(average_iocs.items(), key=lambda t: 1/abs(t[1]-NORMAL_IOC), reverse=True)[:5]
+    closest_iocs = sorted(average_iocs.items(), key=lambda t: 1/abs(t[1]-NORMAL_IOC), reverse=True)
     for key, value in closest_iocs:
         print(f'{key}: ioc = {value}')
 

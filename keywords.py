@@ -40,7 +40,7 @@ def make_back_mapping_dict(keyword):
     
     return mapping_dict
 
-def decipher(ciphertext, keyword):
+def decipher(ciphertext, keyword, human=False):
     ciphertext = ciphertext.lower()
     ciphertext = re.sub(EXCEPT_LOWER_ALPHABET, "", ciphertext)
 
@@ -49,7 +49,16 @@ def decipher(ciphertext, keyword):
 
     for letter in ciphertext:
         plaintext += back_mapping[letter]
-    
+
+    if human:
+        keyword = ""
+
+        for letter in letters:
+            for mapped, original in back_mapping.items():
+                if original == letter:
+                    keyword += mapped
+        plaintext += f'\n\n{string.ascii_lowercase}\n{keyword}'
+
     return plaintext
 
 def brute_keyword(ciphertext, likely_words=[]):
