@@ -22,7 +22,7 @@ def frequency_analyse(text, human=False):
         return {letter: count/char_count*100 for letter, count in dict(counted_items).items()}
 
 def index_of_coincidence(text):
-    stripped_text = re.sub(EXCEPT_LOWER_ALPHABET, '', text)
+    stripped_text = re.sub(EXCEPT_LOWER_ALPHABET, '', text.lower())
     counted_items = Counter(stripped_text)
     char_count = len(stripped_text)
 
@@ -45,3 +45,6 @@ def columnify(text, width):
         columns.append(chunk)
 
     return columns
+
+def chunkify(text, n):
+    return [text[i:i+n] for i in range(0, len(text), n)]
