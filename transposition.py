@@ -69,7 +69,7 @@ def try_find_anagram(ciphertext, kwlen):
     print(order_counts)
     return (sorted(order_counts.items(), key=lambda kv: kv[1])[-1]) if len(order_counts) else ((), 0)
 
-def brute_force(text, likely_words=LIKELY_WORDS, kwlens=None):
+def brute_force(text, likely_words=LIKELY_WORDS, kwlens=None, columnar=True):
     """Not attractive, but effective and fast enough"""
     ciphertext = re.sub(EXCEPT_LOWER_ALPHABET, "", text.lower())
     possibles = []
@@ -81,7 +81,10 @@ def brute_force(text, likely_words=LIKELY_WORDS, kwlens=None):
 
         for kwlen in kwlens:
             print(kwlen)
-            colsolved = ''.join(rows_from_columns(ciphertext, kwlen))
+            if columnar:
+                colsolved = ''.join(rows_from_columns(ciphertext, kwlen))
+            else:
+                colsolved = ciphertext
             for l in itertools.permutations(range(kwlen)):
                 trans = decrypt_rows(colsolved, l)
                 for w in likely_words:
