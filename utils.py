@@ -48,3 +48,10 @@ def columnify(text, width):
 
 def chunkify(text, n):
     return [text[i:i+n] for i in range(0, len(text), n)]
+
+def reinsert_chars(plaintext, extra_chars):
+    pt_list = list(plaintext)
+    for char_item in extra_chars:
+        pt_list.insert(char_item[1], char_item[0])
+    
+    return ''.join(pt_list)

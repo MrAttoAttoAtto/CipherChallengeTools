@@ -40,8 +40,14 @@ def make_back_mapping_dict(keyword):
     
     return mapping_dict
 
-def decipher(ciphertext, keyword, human=False):
+def decipher(ciphertext, keyword, human=False, include_extra_chars=False):
     ciphertext = ciphertext.lower()
+
+    if include_extra_chars:
+        extra_chars = [[m.group(0), m.start(0)] for m in re.finditer(utils.EXCEPT_LOWER_ALPHABET, ciphertext)]
+    else:
+        extra_chars = []
+
     ciphertext = re.sub(EXCEPT_LOWER_ALPHABET, "", ciphertext)
 
     back_mapping = make_back_mapping_dict(keyword)
@@ -49,6 +55,9 @@ def decipher(ciphertext, keyword, human=False):
 
     for letter in ciphertext:
         plaintext += back_mapping[letter]
+
+    if include_extra_chars:
+        plaintext = utils.reinsert_chars(plaintext, extra_chars)
 
     if human:
         keyword = ""
