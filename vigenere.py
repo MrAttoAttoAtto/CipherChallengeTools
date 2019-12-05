@@ -14,7 +14,7 @@ def most_likely_codeword_lengths(text):
 
     # 20 is pretty long, but still reasonable
     average_iocs = {}
-    for length in range(1, 21):
+    for length in range(1, 100):
         summed_ioc = 0
 
         texts_to_analyse = split_text(text, length)

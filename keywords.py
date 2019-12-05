@@ -91,7 +91,7 @@ def brute_keyword(ciphertext, likely_words=[]):
             mapping = make_mapping(word)
             print("\n"+letters+"\n"+mapping)
 
-def frequency_guess(ciphertext):
+def frequency_guess(ciphertext, human=True):
     ciphertext = ciphertext.lower()
     ciphertext = re.sub(EXCEPT_LOWER_ALPHABET, "", ciphertext)
 
@@ -112,12 +112,14 @@ def frequency_guess(ciphertext):
     for letter in ciphertext:
         plaintext += back_mapping[letter]
     
-    keyword = ""
+    if human:
+        keyword = ""
 
-    for letter in letters:
-        for mapped, original in back_mapping.items():
-            if original == letter:
-                keyword += mapped
+        for letter in letters:
+            for mapped, original in back_mapping.items():
+                if original == letter:
+                    keyword += mapped
+        
+        plaintext += f"\n{letters}\n{keyword}"
     
-    print(plaintext)
-    print("\n"+letters+"\n"+keyword)
+    return plaintext
