@@ -26,8 +26,8 @@ float kolmogorov_smirnov_stat(std::vector<float> a, std::vector<float> b) {
 std::vector<float> cumulative_probabilities_counts(std::vector<int> &counts) {
     std::sort(counts.begin(), counts.end());
     float sum = 0;
-    for (auto& n : counts)
-        sum += n;
+    for (auto c:counts)
+        sum += c;
     std::vector<float> retval(counts.size(), 0);
     int max = counts[counts.size()-1];
     float last_val = 0;

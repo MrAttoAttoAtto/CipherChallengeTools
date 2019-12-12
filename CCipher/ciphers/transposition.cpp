@@ -25,7 +25,7 @@ std::string rows_from_columns(std::string text, int n) {
     return result;
 }
 
-std::string decipher(std::string text, std::vector<int> order, bool columnar) {
+std::string decipher(std::string text, const std::vector<int> &order, bool columnar) {
     int col_n = order.size();
     int row_n = (text.size()+col_n-1) / col_n;
     std::string result;
@@ -48,9 +48,9 @@ std::string decipher(std::string text, std::vector<int> order, bool columnar) {
     return result;
 }
 
-std::string brute_force(std::string text, bool columnar, ngram_comparison ngramComparison) {
+std::string brute_force(std::string text, bool columnar, ngram_comparison ngramComparison, int max_length) {
     std::vector<int> curr_order{0,1,2};
-    for (int n = 3; n < 13; n++) {
+    for (int n = 3; n < max_length; n++) {
         boost::timer::auto_cpu_timer t;
         std::cout << n << std::endl;
         std::sort(curr_order.begin(), curr_order.end());
