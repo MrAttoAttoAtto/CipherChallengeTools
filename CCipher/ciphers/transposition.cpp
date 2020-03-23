@@ -59,7 +59,10 @@ std::string brute_force(std::string text, bool columnar, ngram_comparison ngramC
             plain = decipher(text, curr_order, columnar);
             float c = ngramComparison.compare(plain);
             if (c > 0) {
-                std::cout << plain.substr(0, 20) << " " << c << std::endl;
+                std::cout << plain.substr(0, 20) << " " << c << " ";
+                for (auto i = curr_order.begin(); i != curr_order.end(); ++i)
+                    std::cout << *i << ' ';
+                std::cout << std::endl;
             }
         } while (std::next_permutation(curr_order.begin(), curr_order.end()));
         curr_order.push_back(curr_order.size());

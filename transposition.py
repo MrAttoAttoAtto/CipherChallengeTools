@@ -2,6 +2,7 @@
 import itertools
 import re
 from utils import EXCEPT_LOWER_ALPHABET
+import time
 
 LIKELY_WORDS = ["the", "and", "tha", "secret"]
 
@@ -81,6 +82,7 @@ def brute_force(text, likely_words=LIKELY_WORDS, kwlens=None, columnar=True):
 
         for kwlen in kwlens:
             print(kwlen)
+            start = time.time()
             if columnar:
                 colsolved = ''.join(rows_from_columns(ciphertext, kwlen))
             else:
@@ -93,6 +95,8 @@ def brute_force(text, likely_words=LIKELY_WORDS, kwlens=None, columnar=True):
                 else:
                     print(trans[:30],l, len(possibles))
                     possibles.append(trans)
+            end = time.time()
+            print("Time: ", end-start)
     except KeyboardInterrupt:
         pass
     choice = input("Full Text? ")

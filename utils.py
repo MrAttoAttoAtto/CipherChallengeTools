@@ -5,7 +5,7 @@ from collections import Counter
 
 frequency_english = ["e", "t", "a", "o", "i", "n", "s", "r", "h", "l", "d", "c", "u", "m", "f", "p", "g", "w", "y", "b", "v", "k", "x", "j", "q", "z"]
 
-EXCEPT_LOWER_ALPHABET = re.compile('[^a-z]')
+EXCEPT_LOWER_ALPHABET = re.compile('[^a-z0-9]')
 
 letters = string.ascii_lowercase
 
